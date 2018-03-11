@@ -6,7 +6,7 @@ const db = require('./db');
 
 
 const gameName = process.env.TELEGRAM_GAMENAME || 'onemoreclick';
-let url = process.env.URL || 'http://telegram-bot-game.zzz.com.ua'
+let url = process.env.URL || 'http://telegram-bot.zzz.com.ua'
 
 
 
