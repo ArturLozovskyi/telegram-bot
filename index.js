@@ -5,6 +5,12 @@ const db = require('./db');
 
 
 
+const gameName = process.env.TELEGRAM_GAMENAME || 'onemoreclick';
+let url = process.env.URL || 'http://telegram-bot-game.zzz.com.ua'
+
+
+
+
 bot.onText(/\/help/, msg=> {
   const chatId = msg.chat.id
   bot.sendMessage(chatId, 'Я умею показывать расписание, чтобы посмотреть его введи сообщение, которое содержит "расписание", а также отвечаю на некоторые сообщения) ')
@@ -12,7 +18,6 @@ bot.onText(/\/help/, msg=> {
 
 bot.on('message', msg=>{
   
-
   const chatId = msg.chat.id
   var message = msg.text.toLowerCase();
 
@@ -70,6 +75,19 @@ bot.on('message', msg=>{
     })
     break
   }
+});
+
+
+
+
+// Matches /start
+bot.onText(/\/play/, function onPhotoText(msg) {
+  bot.sendGame(msg.chat.id, gameName);
+});
+
+// Handle callback queries
+bot.on('callback_query', function onCallbackQuery(callbackQuery) {
+  bot.answerCallbackQuery(callbackQuery.id, { url });
 });
 
 
