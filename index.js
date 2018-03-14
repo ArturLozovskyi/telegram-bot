@@ -28,38 +28,91 @@ bot.onText(/\/tasks/, msg=> {
     reply_markup:{
       keyboard: [
         ['Просмотреть'],
-        ['Добавить','Удалить'],
+        ['Напомнить','Удалить'],
         ['Закрыть']
       ]
     }
   })
+});
   
-  bot.onText(/^Добавить$/, msg=> {
-    bot.sendMessage(chatId, 'Напиши что нужно добавить в таком виде : "Напомни..."')
+  bot.onText(/^Напомнить$/, msg=> {
+    const chatId = msg.from.id;
+    bot.sendMessage(chatId, 'Напиши что нужно добавить в таком виде : "Напомни ... "', {
+      reply_markup:{
+        remove_keyboard: true
+      }
+    })
   });
 
 
-  bot.onText(/Напомни (.+)$/, function (msg, match) {
+  bot.onText(/^Напомни (.+)$/, function (msg, match) {
+    const chatId = msg.from.id;
     var userId = msg.from.id;
     var text = match[1];
     tasks.push( { 'uid':userId, 'text':text } );
     bot.sendMessage(chatId, 'Хорошо)');
   });
 
-  bot.onText(/^Просмотреть$/, msg=> {
+  
+  bot.onText(/^Просмотреть$/, msg=> {  
     var i = 0;
+    const chatId = msg.from.id;
     tasks.forEach(task=>{
-      if(chatId == task.uid){
-        bot.sendMessage(task.uid, 'Напоминаю, что вы должны: '+ task.text);
-        //tasks.splice(i,1);
-        ++i;
+      if(chatId === task.uid){
+        bot.sendMessage(task.uid, 'Напоминаю, что вы должны: '+ task.text), {
+          reply_markup:{
+            remove_keyboard: true
+          }
+        };
+        i++;
       }
     })
     if(i==0){
-    bot.sendMessage(chatId, 'Ничего не запланировано');
+    bot.sendMessage(chatId, 'Ничего не запланировано', {
+      reply_markup:{
+        remove_keyboard: true
+      }
+    });
     }
   });
+
+
+  bot.onText(/^Удалить$/, msg=> {
+    var i = 0;
+    const chatId = msg.from.id;
+    var k = 0;
+
+    bot.sendMessage(chatId, 'Напиши что нужно удалить в таком виде : "Удали ... (номер)"');
+
+    tasks.forEach(task=>{
+      if(chatId === task.uid){
+        k++;
+        bot.sendMessage(task.uid, k+'. '+ task.text), {
+          reply_markup:{
+            remove_keyboard: true
+          }
+        };
+        i++;
+      }
+    })
+    if(i==0){
+    bot.sendMessage(chatId, 'Ничего не запланировано', {
+      reply_markup:{
+        remove_keyboard: true
+      }
+    });
+    }
 });
+
+
+  bot.onText(/^Удали (.+)$/, function (msg, match) {
+    const chatId = msg.from.id;
+    var number = match[1];
+    tasks.splice(number-1,1);
+    bot.sendMessage(chatId, 'Удалила)');
+  });
+
+
 
 
 ///////////////////////////////////////////////////////////////////////
