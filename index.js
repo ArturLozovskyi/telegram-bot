@@ -4,9 +4,10 @@ const bot = new TelegramBot(token.url, { polling: true });
 const db = require('./db');
 
 
-
 const gameName = process.env.TELEGRAM_GAMENAME || 'onemoreclick';
 let url = process.env.URL || 'http://telegram-bot.zzz.com.ua'
+
+
 
 
 
@@ -14,7 +15,54 @@ let url = process.env.URL || 'http://telegram-bot.zzz.com.ua'
 bot.onText(/\/help/, msg=> {
   const chatId = msg.chat.id
   bot.sendMessage(chatId, 'Я умею показывать расписание, чтобы посмотреть его введи сообщение, которое содержит "расписание", а также отвечаю на некоторые сообщения) ')
-})
+});
+
+///////////////////////////////////////////////////////////////////////
+
+var tasks = [];
+
+bot.onText(/\/tasks/, msg=> {
+  const chatId = msg.from.id;
+
+  bot.sendMessage(chatId, 'Что нужно сделать?', {
+    reply_markup:{
+      keyboard: [
+        ['Просмотреть'],
+        ['Добавить','Удалить'],
+        ['Закрыть']
+      ]
+    }
+  })
+  
+  bot.onText(/^Добавить$/, msg=> {
+    bot.sendMessage(chatId, 'Напиши что нужно добавить в таком виде : "Напомни..."')
+  });
+
+
+  bot.onText(/Напомни (.+)$/, function (msg, match) {
+    var userId = msg.from.id;
+    var text = match[1];
+    tasks.push( { 'uid':userId, 'text':text } );
+    bot.sendMessage(chatId, 'Хорошо)');
+  });
+
+  bot.onText(/^Просмотреть$/, msg=> {
+    var i = 0;
+    tasks.forEach(task=>{
+      if(chatId == task.uid){
+        bot.sendMessage(task.uid, 'Напоминаю, что вы должны: '+ task.text);
+        //tasks.splice(i,1);
+        ++i;
+      }
+    })
+    if(i==0){
+    bot.sendMessage(chatId, 'Ничего не запланировано');
+    }
+  });
+});
+
+
+///////////////////////////////////////////////////////////////////////
 
 bot.on('message', msg=>{
   
@@ -89,8 +137,6 @@ bot.onText(/\/play/, function onPhotoText(msg) {
 bot.on('callback_query', function onCallbackQuery(callbackQuery) {
   bot.answerCallbackQuery(callbackQuery.id, { url });
 });
-
-
 
 
 
