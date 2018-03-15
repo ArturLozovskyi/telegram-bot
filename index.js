@@ -2,7 +2,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const token = require('./token');
 const bot = new TelegramBot(token.url, { polling: true });
 const db = require('./db');
-
+const fs = require('fs');
 
 const gameName = process.env.TELEGRAM_GAMENAME || 'onemoreclick';
 let url = process.env.URL || 'http://telegram-bot.zzz.com.ua'
@@ -19,7 +19,15 @@ bot.onText(/\/help/, msg=> {
 
 ///////////////////////////////////////////////////////////////////////
 
-var tasks = [];
+var tasks;
+
+fs.readFile("tasks.txt","utf8", (err,data)=>{
+  if(err){
+    throw err;
+    console.log(err);
+  }
+  tasks = JSON.parse(data);
+});
 
 bot.onText(/\/tasks/, msg=> {
   const chatId = msg.from.id;
@@ -51,6 +59,12 @@ bot.onText(/\/tasks/, msg=> {
     var text = match[1];
     tasks.push( { 'uid':userId, 'text':text } );
     bot.sendMessage(chatId, 'Хорошо)');
+    fs.writeFile("tasks.txt", JSON.stringify(tasks),(err)=>{
+      if(err){
+        throw err;
+        console.log(err);
+      }
+    });
   });
 
   
@@ -110,6 +124,12 @@ bot.onText(/\/tasks/, msg=> {
     var number = match[1];
     tasks.splice(number-1,1);
     bot.sendMessage(chatId, 'Удалила)');
+    fs.writeFile("tasks.txt", JSON.stringify(tasks),(err)=>{
+      if(err){
+        throw err;
+        console.log(err);
+      }
+    });
   });
 
 
@@ -130,7 +150,7 @@ bot.on('message', msg=>{
     })
   }
 
-  else if(message.indexOf('расписание') != -1){
+  else if(message.indexOf('расписание') != -1 || message == "/schedule"){
     bot.sendMessage(chatId, 'Выбери день ', {
       reply_markup:{
         keyboard: [
