@@ -160,7 +160,7 @@ bot.onText(/\/tasks/, msg=> {
         newTask.push(task);
       }
     });
-    if(number=>0&&number<newTask.length){
+    if((number=>0)&&(number<newTask.length)&&(newTask.length!=0)){
       MongoClient.connect(urlDB, (err,database)=>{
         if(err){
           throw err;
@@ -178,8 +178,11 @@ bot.onText(/\/tasks/, msg=> {
         tasks = results;
       });
     });
-      bot.sendMessage(chatId, 'Удалила)');
-}
+      bot.sendMessage(chatId, 'Удалила)');  
+  }
+  else{
+    bot.sendMessage(chatId, 'Напиши еще раз)');  
+  }
 });
 
 
@@ -260,7 +263,6 @@ bot.onText(/\/play/, function onPhotoText(msg) {
 bot.on('callback_query', function onCallbackQuery(callbackQuery) {
   bot.answerCallbackQuery(callbackQuery.id, { url });
 });
-
 
 
 
