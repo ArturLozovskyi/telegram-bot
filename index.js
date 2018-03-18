@@ -10,7 +10,6 @@ var urlDB = 'mongodb://lozovartur77:45balo45__@ds245238.mlab.com:45238/telegramb
 
 
 
-
 const gameName = process.env.TELEGRAM_GAMENAME || 'onemoreclick';
 let url = process.env.URL || 'http://telegram-bot.zzz.com.ua'
 
@@ -161,24 +160,26 @@ bot.onText(/\/tasks/, msg=> {
         newTask.push(task);
       }
     });
-    MongoClient.connect(urlDB, (err,database)=>{
-      if(err){
-        throw err;
-        console.log(err);
-      }  
-      database.collection('tasks').deleteOne({id: newTask[number].id,text:newTask[number].text}, function(err, result){       
+    if(number>0&&number<newTask.length){
+      MongoClient.connect(urlDB, (err,database)=>{
+        if(err){
+          throw err;
+          console.log(err);
+        }  
+        database.collection('tasks').deleteOne({id: newTask[number].id,text:newTask[number].text}, function(err, result){       
+          if(err){
+            throw err;
+          }
+      });
+      database.collection('tasks').find().toArray(function(err, results){
         if(err){
           throw err;
         }
+        tasks = results;
+      });
     });
-    database.collection('tasks').find().toArray(function(err, results){
-      if(err){
-        throw err;
-      }
-      tasks = results;
-    });
-  });
-    bot.sendMessage(chatId, 'Удалила)');
+      bot.sendMessage(chatId, 'Удалила)');
+}
 });
 
 
