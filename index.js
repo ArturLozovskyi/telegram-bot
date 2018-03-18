@@ -2,13 +2,16 @@ const TelegramBot = require('node-telegram-bot-api');
 const token = require('./token');
 const bot = new TelegramBot(token.url, { polling: true });
 const db = require('./db');
+var MongoClient = require('mongodb').MongoClient;
+var urlDB = 'mongodb://lozovartur77:45balo45__@ds245238.mlab.com:45238/telegrambot';
+
+
+
+
 
 
 const gameName = process.env.TELEGRAM_GAMENAME || 'onemoreclick';
 let url = process.env.URL || 'http://telegram-bot.zzz.com.ua'
-
-
-
 
 
 
@@ -20,6 +23,21 @@ bot.onText(/\/help/, msg=> {
 ///////////////////////////////////////////////////////////////////////
 
 var tasks = [];
+MongoClient.connect(urlDB, (err,database)=>{
+  if(err){
+    throw err;
+    console.log(err);
+  }
+  else{
+    console.log('Connected!');
+    database.collection('tasks').find().toArray(function(err, results){
+      tasks = results;
+      database.close();
+    });
+  }   
+});
+
+
 
 bot.onText(/\/tasks/, msg=> {
   const chatId = msg.from.id;
@@ -47,9 +65,34 @@ bot.onText(/\/tasks/, msg=> {
 
   bot.onText(/^Напомни (.+)$/, function (msg, match) {
     const chatId = msg.from.id;
-    var userId = msg.from.id;
     var text = match[1];
-    tasks.push( { 'uid':userId, 'text':text } );
+    MongoClient.connect(urlDB, (err,database)=>{
+      if(err){
+        throw err;
+        console.log(err);
+      }
+      else{
+        console.log('Connected!');
+        var collection = database.collection('tasks');
+        var task = {
+          id: chatId,
+          text: text
+        };
+        collection.insertOne(task,(err,result)=>{
+          if(err){
+            throw err;
+            console.log(err);
+          }
+          console.log(result.ops);
+
+          database.collection('tasks').find().toArray(function(err, results){
+            tasks = results;
+            console.log(tasks)
+            database.close();
+          });
+        });
+      }
+    });
     bot.sendMessage(chatId, 'Хорошо)');
   });
 
@@ -58,8 +101,8 @@ bot.onText(/\/tasks/, msg=> {
     var i = 0;
     const chatId = msg.from.id;
     tasks.forEach(task=>{
-      if(chatId === task.uid){
-        bot.sendMessage(task.uid, 'Напоминаю, что вы должны: '+ task.text), {
+      if(chatId === task.id){
+        bot.sendMessage(task.id, 'Напоминаю, что вы должны: '+ task.text), {
           reply_markup:{
             remove_keyboard: true
           }
@@ -81,13 +124,16 @@ bot.onText(/\/tasks/, msg=> {
     var i = 0;
     const chatId = msg.from.id;
     var k = 0;
-
-    bot.sendMessage(chatId, 'Напиши что нужно удалить в таком виде : "Удали ... (номер)"');
+    bot.sendMessage(chatId, 'Напиши что нужно удалить в таком виде : "Удали ... (номер)"',{
+      reply_markup:{
+        remove_keyboard: true
+      }
+    });
 
     tasks.forEach(task=>{
-      if(chatId === task.uid){
+      if(chatId === task.id){
         k++;
-        bot.sendMessage(task.uid, k+'. '+ task.text), {
+        bot.sendMessage(task.id, k+'. '+ task.text), {
           reply_markup:{
             remove_keyboard: true
           }
@@ -107,10 +153,32 @@ bot.onText(/\/tasks/, msg=> {
 
   bot.onText(/^Удали (.+)$/, function (msg, match) {
     const chatId = msg.from.id;
-    var number = match[1];
-    tasks.splice(number-1,1);
-    bot.sendMessage(chatId, 'Удалила)');
+    var number = match[1]-1;
+    var newTask = [];
+    tasks.forEach(task=>{
+      if(task.id = chatId){
+        newTask.push(task);
+      }
+    });
+    MongoClient.connect(urlDB, (err,database)=>{
+      if(err){
+        throw err;
+        console.log(err);
+      }  
+      database.collection('tasks').deleteOne({id: newTask[number].id,text:newTask[number].text}, function(err, result){       
+        if(err){
+          throw err;
+        }
+    });
+    database.collection('tasks').find().toArray(function(err, results){
+      if(err){
+        throw err;
+      }
+      tasks = results;
+    });
   });
+    bot.sendMessage(chatId, 'Удалила)');
+});
 
 
 
