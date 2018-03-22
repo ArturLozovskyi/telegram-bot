@@ -160,7 +160,7 @@ bot.onText(/\/tasks/, msg=> {
         newTask.push(task);
       }
     });
-    if((number=>0)&&(number<newTask.length)&&(newTask.length!=0)){
+    if((number>=0)&&(number<newTask.length)&&(newTask.length!=0)){
       MongoClient.connect(urlDB, (err,database)=>{
         if(err){
           throw err;
