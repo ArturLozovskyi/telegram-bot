@@ -3,7 +3,7 @@ const token = require('./token');
 const bot = new TelegramBot(token.url, { polling: true });
 const db = require('./db');
 var MongoClient = require('mongodb').MongoClient;
-var urlDB = 'mongodb://lozovartur77:45balo45__@ds245238.mlab.com:45238/telegrambot';
+var urlDB = 'mongodb://lozovartur77:45balo45__@ds237120.mlab.com:37120/telegram';
 
 
 
