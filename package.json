@@ -6,15 +6,17 @@
   "scripts": {
     "start": "node index.js"
   },
-  "engines" : {
-    "node" : "9.2.0"
+  "engines": {
+    "node": "9.2.0"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.14.0",
     "mlab-data-api": "^0.2.2",
     "mongolab-data-api": "^1.1.6",
-    "mongoose": "^5.0.6",
-    "node-telegram-bot-api": "^0.30.0"
+    "node-telegram-bot-api": "^0.30.0",
+    "mongodb": "^2.2.33"
   }
 }

@@ -1,4 +1,4 @@
 const token = {
-    url: '558004908:AAH3wxxqh9FnTkVnWGhIf2XYZI9wDQ3PssE'
+    url: '558004908:AAFiU_1I6o83DAJCwP5OJjxb5hoW2t9pXXk'
 };
 module.exports = token;
