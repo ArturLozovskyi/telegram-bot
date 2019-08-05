@@ -7,9 +7,6 @@ var urlDB = 'mongodb://lozovartur77:45balo45__@ds237120.mlab.com:37120/telegram'
 
 
 
-
-
-
 const gameName = process.env.TELEGRAM_GAMENAME || 'onemoreclick';
 let url = process.env.URL || 'http://telegram-bot.zzz.com.ua'
 
@@ -36,8 +33,6 @@ MongoClient.connect(urlDB, (err,database)=>{
     });
   }   
 });
-
-
 
 bot.onText(/\/tasks/, msg=> {
   const chatId = msg.from.id;
@@ -160,7 +155,7 @@ bot.onText(/\/tasks/, msg=> {
         newTask.push(task);
       }
     });
-    if((number>=0)&&(number<newTask.length)&&(newTask.length!=0)){
+    if((number=>0)&&(number<newTask.length)&&(newTask.length!=0)){
       MongoClient.connect(urlDB, (err,database)=>{
         if(err){
           throw err;
@@ -192,7 +187,11 @@ bot.onText(/\/tasks/, msg=> {
 
 bot.on('message', msg=>{
   
-  const chatId = msg.chat.id
+  const chatId = msg.chat.id;
+  if(msg.chat.type === 'group' && msg.from.id === 565126483) {
+    bot.sendMessage(chatId, 'Артур только что написал: ' + msg.text);
+  }
+
   var message = msg.text.toLowerCase();
 
   if(message == 'закрыть'){
