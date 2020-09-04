@@ -17,6 +17,6 @@
     "mlab-data-api": "^0.2.2",
     "mongolab-data-api": "^1.1.6",
     "node-telegram-bot-api": "^0.30.0",
-    "mongodb": "^2.2.33"
+    "mongodb": "^3.1.13"
   }
 }
